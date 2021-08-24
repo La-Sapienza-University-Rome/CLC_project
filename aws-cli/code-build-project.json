@@ -1,0 +1,27 @@
+{
+  "name": "CarServiceCodeBuildProject",
+  "artifacts": {
+    "type": "no_artifacts"
+  },
+  "environment": {
+    "computeType": "BUILD_GENERAL1_SMALL",
+    "image": "aws/codebuild/python:3.5.2",
+    "privilegedMode": true,
+    "environmentVariables": [
+      {
+        "name": "AWS_ACCOUNT_ID",
+        "value": "206359944707"
+      },
+      {
+        "name": "AWS_DEFAULT_REGION",
+        "value": "us-east-1"
+      }
+    ],
+    "type": "LINUX_CONTAINER"
+  },
+  "serviceRole": "arn:aws:iam::206359944707:role/CarServiceCodeBuildServiceRole",
+  "source": {
+    "type": "CODECOMMIT",
+    "location": "https://git-codecommit.us-east-1.amazonaws.com/v1/repos/CarService-Repository"
+  }
+}
