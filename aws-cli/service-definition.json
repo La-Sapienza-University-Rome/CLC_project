@@ -1,0 +1,30 @@
+{
+  "serviceName": "CarService-Service",
+  "cluster": "CarService-Cluster",
+  "launchType": "FARGATE",
+  "deploymentConfiguration": {
+    "maximumPercent": 200,
+    "minimumHealthyPercent": 0
+  },
+  "desiredCount": 1,
+  "networkConfiguration": {
+    "awsvpcConfiguration": {
+      "assignPublicIp": "DISABLED",
+      "securityGroups": [
+        "sg-05e69393ab4cbcb56"
+      ],
+      "subnets": [
+        "subnet-0596cf5ee0fe9444e",
+        "subnet-009f8b4e6f3f83c1d"
+      ]
+    }
+  },
+  "taskDefinition": "carservice",
+  "loadBalancers": [
+    {
+      "containerName": "Car-Service",
+      "containerPort": 8080,
+      "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:206359944707:targetgroup/CarService-TargetGroup/b5ed3b477e1a8e52"
+    }
+  ]
+}
