@@ -13,16 +13,23 @@ import pandas as pd
 from app import app
 
 import boto3
+import smart_open
 
 
 # Conncet to S3
-s3 = boto3.resource('s3')
-model_file = s3.Object('arn:aws:s3:::clc-prediction-bucket','model_lin_reg.txt')
-model_f = open(model_file, 'r')
-    
+try:
+    #s3 = boto3.resource('s3')
+    #model_file = s3.Object('clc-prediction-bucket','model_lin_reg.txt').get()['Body'] # .read().decode('utf-8')
+    model_path = 's3:clc-prediction-bucket/model_lin_reg.txt'
+    model_f = smart_open.open(model_path, 'r')
+    h1 = html.H1(model_f.readline(), style={"textAlign": "center", "color":  "#4397a3", "font-weight": "bold"})
+    model_f.close()
+except Exception as e:
+    h1 = html.H1(str(e), style={"textAlign": "center", "color":  "#4397a3", "font-weight": "bold"})
 
 # Define layout for web page "upload"
 layout = html.Div([
+    h1,
     # Set title
     html.H1('Upload new data set', style={"textAlign": "center", "color":  "#4397a3", "font-weight": "bold"}),
     # Set text for uploading

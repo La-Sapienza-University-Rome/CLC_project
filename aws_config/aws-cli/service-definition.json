@@ -24,7 +24,7 @@
     {
       "containerName": "Car-Service",
       "containerPort": 8080,
-      "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:206359944707:targetgroup/CarService-TargetGroup/4c7cae60f31787c2"
+      "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:206359944707:targetgroup/CarService-TargetGroup/f7e3f50b5eb7551e"
     }
   ]
 }

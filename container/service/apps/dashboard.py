@@ -13,17 +13,17 @@ PATH = pathlib.Path(__file__).parent
 DATA_PATH = PATH.joinpath("../datasets").resolve()
 
 # Read data
-dfv = pd.read_csv(DATA_PATH.joinpath("used_cars_data_randomsample10000.csv"), sep="|")
+#dfv = pd.read_csv(DATA_PATH.joinpath("used_cars_data_randomsample10000.csv"), sep="|")
 
 
 try:
     s3 = boto3.resource('s3')
     data_file = s3.Object('clc-dashboard-bucket','used_cars_data_randomsample10000.csv').get()['Body']
-    print(type(data_file))
     dfv = pd.read_csv(data_file, sep="|")
-    h1 = html.H1('Oh yesss, success!', style={"textAlign": "center", "color":  "#4397a3", "font-weight": "bold"})
+    h1 = html.H1(f'Oh yesss, success! Data [{dfv.shape}]', style={"textAlign": "center", "color":  "#4397a3", "font-weight": "bold"})
 except Exception as e:
     h1 = html.H1(str(e), style={"textAlign": "center", "color":  "#4397a3", "font-weight": "bold"})
+    dfv = pd.read_csv(DATA_PATH.joinpath("used_cars_data_randomsample10000.csv"), sep="|")
 
 # Get all the columns' types
 col_types = dfv.dtypes
