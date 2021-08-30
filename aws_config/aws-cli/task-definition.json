@@ -1,0 +1,32 @@
+{
+  "family": "carservice",
+  "cpu": "256",
+  "memory": "512",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "executionRoleArn": "arn:aws:iam::206359944707:role/CLCWebAppCoreStack-EcsServiceRole-2UG4XK15JL4Y",
+  "taskRoleArn": "arn:aws:iam::206359944707:role/CLCWebAppCoreStack-ECSTaskRole-QG9ES9ZNO0UV",
+  "containerDefinitions": [
+    {
+      "name": "Car-Service",
+      "image": "206359944707.dkr.ecr.us-east-1.amazonaws.com/carservice/service:latest",
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "protocol": "http"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "carservice-logs",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "awslogs-carservice-service"
+        }
+      },
+      "essential": true
+    }
+  ]
+}

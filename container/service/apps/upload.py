@@ -12,6 +12,15 @@ import dash_table
 import pandas as pd
 from app import app
 
+import boto3
+
+
+# Conncet to S3
+s3 = boto3.resource('s3')
+model_file = s3.Object('arn:aws:s3:::clc-prediction-bucket','model_lin_reg.txt')
+model_f = open(model_file, 'r')
+    
+
 # Define layout for web page "upload"
 layout = html.Div([
     # Set title
@@ -41,6 +50,8 @@ layout = html.Div([
     ),
     html.Div(id='output-data-upload'),
 ])
+
+
 
 # Define function to upload CSV (must be separated by "|")
 def parse_contents(contents, filename, date):

@@ -6,6 +6,7 @@ import plotly.express as px
 import pandas as pd
 import pathlib
 from app import app
+import boto3
 
 # Get relative data folder
 PATH = pathlib.Path(__file__).parent
@@ -13,6 +14,16 @@ DATA_PATH = PATH.joinpath("../datasets").resolve()
 
 # Read data
 dfv = pd.read_csv(DATA_PATH.joinpath("used_cars_data_randomsample10000.csv"), sep="|")
+
+
+try:
+    s3 = boto3.resource('s3')
+    data_file = s3.Object('clc-dashboard-bucket','used_cars_data_randomsample10000.csv').get()['Body']
+    print(type(data_file))
+    dfv = pd.read_csv(data_file, sep="|")
+    h1 = html.H1('Oh yesss, success!', style={"textAlign": "center", "color":  "#4397a3", "font-weight": "bold"})
+except Exception as e:
+    h1 = html.H1(str(e), style={"textAlign": "center", "color":  "#4397a3", "font-weight": "bold"})
 
 # Get all the columns' types
 col_types = dfv.dtypes
@@ -23,6 +34,7 @@ numerical_vars = col_types[col_types != "object"].index
 
 # Define layout of Dashboard page
 layout = html.Div([
+    h1, 
     # Set title
     html.H1('US Used cars Dashboard', style={"textAlign": "center", "color":  "#4397a3", "font-weight": "bold"}),
     # Include dropdown for categorical variables

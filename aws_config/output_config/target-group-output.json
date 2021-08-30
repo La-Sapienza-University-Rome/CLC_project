@@ -3,7 +3,7 @@
         {
             "HealthCheckPath": "/", 
             "HealthCheckIntervalSeconds": 10, 
-            "VpcId": "vpc-0605d5d23cfc7314a", 
+            "VpcId": "vpc-0fbe748989634175f", 
             "Protocol": "TCP", 
             "HealthCheckTimeoutSeconds": 6, 
             "TargetType": "ip", 
@@ -13,7 +13,7 @@
             }, 
             "UnhealthyThresholdCount": 3, 
             "HealthyThresholdCount": 3, 
-            "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:206359944707:targetgroup/CarService-TargetGroup/b5ed3b477e1a8e52", 
+            "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:206359944707:targetgroup/CarService-TargetGroup/4c7cae60f31787c2", 
             "HealthCheckEnabled": true, 
             "HealthCheckPort": "traffic-port", 
             "Port": 8080, 

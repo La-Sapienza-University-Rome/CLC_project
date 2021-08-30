@@ -6,12 +6,12 @@
   "requiresCompatibilities": [
     "FARGATE"
   ],
-  "executionRoleArn": "arn:aws:iam::206359944707:role/CLCWebAppCoreStack-EcsServiceRole-1QKFSEV8BL9WR",
-  "taskRoleArn": "arn:aws:iam::206359944707:role/CLCWebAppCoreStack-ECSTaskRole-1GEB98J9SZD06",
+  "executionRoleArn": "REPLACE_ME_ECS_SERVICE_ROLE_ARN",
+  "taskRoleArn": "REPLACE_ME_ECS_TASK_ROLE_ARN",
   "containerDefinitions": [
     {
       "name": "Car-Service",
-      "image": "206359944707.dkr.ecr.us-east-1.amazonaws.com/carservice/service:latest",
+      "image": "REPLACE_ME_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/carservice/service:latest",
       "portMappings": [
         {
           "containerPort": 8080,

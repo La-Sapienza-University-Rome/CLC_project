@@ -11,11 +11,11 @@
     "awsvpcConfiguration": {
       "assignPublicIp": "DISABLED",
       "securityGroups": [
-        "sg-05e69393ab4cbcb56"
+        "REPLACE_ME_SECURITY_GROUP_ID"
       ],
       "subnets": [
-        "subnet-0596cf5ee0fe9444e",
-        "subnet-009f8b4e6f3f83c1d"
+        "REPLACE_ME_PRIVATE_SUBNET_ONE",
+        "REPLACE_ME_PRIVATE_SUBNET_TWO"
       ]
     }
   },
@@ -24,7 +24,7 @@
     {
       "containerName": "Car-Service",
       "containerPort": 8080,
-      "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:206359944707:targetgroup/CarService-TargetGroup/b5ed3b477e1a8e52"
+      "targetGroupArn": "REPLACE_ME_NLB_TARGET_GROUP_ARN"
     }
   ]
 }

@@ -188,7 +188,24 @@ Resources:
         - !Ref 'PrivateRouteTableTwo'
       ServiceName: !Join [ "", [ "com.amazonaws.", { "Ref": "AWS::Region" }, ".dynamodb" ] ]
       VpcId: !Ref 'VPC'
+    
+    
+  # Create S3 bucket for the dashboard data
+  S3Bucket1:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      AccessControl: Private
+      BucketName: clc-dashboard-bucket
+    
 
+  # Create S3 bucket for the prediction data
+  S3Bucket2:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      AccessControl: Private
+      BucketName: clc-prediction-bucket
 
 
   # The security group for our service containers to be hosted in Fargate.
@@ -300,7 +317,18 @@ Resources:
                 - 'logs:CreateLogGroup'
                 - 'logs:PutLogEvents'
               Resource: '*'
-
+            - Effect: Allow
+              Action:
+                # Allow the ECS tasks to interact with S3 dashboard_bucket
+                - 's3:GetObject'
+                - 's3:PutObject'
+              Resource: ['arn:aws:s3:::clc-dashboard-bucket/*', 'arn:aws:s3:::clc-dashboard-bucket']
+            - Effect: Allow
+              Action:
+                # Allow the ECS tasks to interact with S3 prediction_bucket
+                - 's3:GetObject'
+                - 's3:PutObject'
+              Resource: ['arn:aws:s3:::clc-prediction-bucket/*', 'arn:aws:s3:::clc-prediction-bucket']
             - Effect: Allow
               Action:
                 # Allows the ECS tasks to interact with only the CarDataTable
