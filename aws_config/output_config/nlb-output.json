@@ -1,0 +1,30 @@
+{
+    "LoadBalancers": [
+        {
+            "IpAddressType": "ipv4", 
+            "VpcId": "vpc-0fbe748989634175f", 
+            "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:206359944707:loadbalancer/net/carservice-nlb/9f3221b90e0df4a0", 
+            "State": {
+                "Code": "provisioning"
+            }, 
+            "DNSName": "carservice-nlb-9f3221b90e0df4a0.elb.us-east-1.amazonaws.com", 
+            "LoadBalancerName": "carservice-nlb", 
+            "CreatedTime": "2021-09-02T12:28:27.733Z", 
+            "Scheme": "internet-facing", 
+            "Type": "network", 
+            "CanonicalHostedZoneId": "Z26RNL4JYFTOTI", 
+            "AvailabilityZones": [
+                {
+                    "SubnetId": "subnet-0e48ae89083da681d", 
+                    "LoadBalancerAddresses": [], 
+                    "ZoneName": "us-east-1b"
+                }, 
+                {
+                    "SubnetId": "subnet-0d777126d8930cffe", 
+                    "LoadBalancerAddresses": [], 
+                    "ZoneName": "us-east-1a"
+                }
+            ]
+        }
+    ]
+}
