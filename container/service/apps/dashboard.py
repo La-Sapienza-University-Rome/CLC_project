@@ -6,25 +6,46 @@ import plotly.express as px
 import pandas as pd
 import pathlib
 from app import app
+import boto3
+import awswrangler as wr
 
-# Get relative data folder
-PATH = pathlib.Path(__file__).parent
-DATA_PATH = PATH.joinpath("../datasets").resolve()
 
 # Read data
-dfv = pd.read_csv(DATA_PATH.joinpath("used_cars_data_randomsample10000.csv"), sep="|")
+try:
+    # Connect to S3 and get the object 'columns.csv'
+    s3 = boto3.resource('s3')
+    obj_s3 = s3.Object('clc-dashboard-bucket','columns.csv').get()['Body']
 
-# Get all the columns' types
-col_types = dfv.dtypes
+    # Read the object
+    col_types = pd.read_csv(obj_s3, sep=",")
+
+    # Success message
+    h1 = html.H1(f'US Used cars Dashboard', style={"textAlign": "center", "color":  "#4397a3", "font-weight": "bold"})
+except Exception as e:
+    # Get relative data folder
+    PATH = pathlib.Path(__file__).parent
+    DATA_PATH = PATH.joinpath("../datasets").resolve()
+    
+    # Load dummy data if the connection to S3 fails
+    dfv = pd.read_csv(DATA_PATH.joinpath("used_cars_data_randomsample10000.csv"), sep="|")
+    col_types = dfv.dtypes
+
+    # Failure message
+    h1 = html.H1(f'US Used cars Dashboard | {str(e)}', style={"textAlign": "center", "color":  "#4397a3", "font-weight": "bold"})
+
 
 # Get continuous and categorical variables
-categorical_vars = col_types[col_types == "object"].index
-numerical_vars = col_types[col_types != "object"].index
+try:
+    categorical_vars = col_types[col_types['type'] == "object"]['column']
+    numerical_vars = col_types[col_types['type'] != "object"]['column']
+except:
+    categorical_vars = col_types[col_types == "object"].index
+    numerical_vars = col_types[col_types != "object"].index
 
 # Define layout of Dashboard page
-layout = html.Div([
+layout = html.Div([ 
     # Set title
-    html.H1('US Used cars Dashboard', style={"textAlign": "center", "color":  "#4397a3", "font-weight": "bold"}),
+    h1,
     # Include dropdown for categorical variables
     html.Div([
         html.Div([
@@ -59,9 +80,8 @@ layout = html.Div([
 
 # Define function to plot bar chart for categorical variables
 def display_value(var_categ_chosen):
-    group_df = pd.value_counts(dfv[var_categ_chosen]).to_frame().reset_index()
-    group_df.columns = [var_categ_chosen, 'Count']
-    fig = px.bar(group_df, x=var_categ_chosen, y="Count")
+    feat_df = wr.s3.read_parquet([f's3://clc-dashboard-bucket/results/{var_categ_chosen}.parquet.gzip'])
+    fig = px.bar(feat_df, x=var_categ_chosen, y="counts")
     fig = fig.update_layout({
         'paper_bgcolor': '#303030',
         'plot_bgcolor': '#303030',
@@ -79,8 +99,9 @@ def display_value(var_categ_chosen):
     [Input(component_id='conti-dropdown', component_property='value')]
 )
 # Define function to plot bar chart for categorical variables
-def display_value(var_cont_chosen):
-    fig = px.histogram(dfv, x=var_cont_chosen)
+def display_value_cont(var_cont_chosen):
+    feat_df = wr.s3.read_parquet([f's3://clc-dashboard-bucket/results/{var_cont_chosen}.parquet.gzip'])
+    fig = px.bar(feat_df, x=var_cont_chosen, y='counts')
     fig = fig.update_layout({
         'paper_bgcolor': '#303030',
         'plot_bgcolor': '#303030',

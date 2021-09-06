@@ -2,6 +2,8 @@
 import base64
 import datetime
 import io
+import json
+import numpy as np
 
 import dash
 from dash.dependencies import Input, Output, State
@@ -12,8 +14,18 @@ import dash_table
 import pandas as pd
 from app import app
 
+import boto3
+import smart_open
+
+import pathlib
+
+# Delete
+PATH = pathlib.Path(__file__).parent
+DATA_PATH = PATH.joinpath("../datasets").resolve()
+
 # Define layout for web page "upload"
 layout = html.Div([
+    html.H1('Car Price Predictor', style={"textAlign": "center", "color":  "#4397a3", "font-weight": "bold"}),
     # Set title
     html.H1('Upload new data set', style={"textAlign": "center", "color":  "#4397a3", "font-weight": "bold"}),
     # Set text for uploading
@@ -42,8 +54,27 @@ layout = html.Div([
     html.Div(id='output-data-upload'),
 ])
 
+
+
 # Define function to upload CSV (must be separated by "|")
 def parse_contents(contents, filename, date):
+    
+    # Conncet to S3
+    try:
+        #s3 = boto3.resource('s3')
+        #model_file = s3.Object('clc-prediction-bucket','model_lin_reg.txt').get()['Body'] # .read().decode('utf-8')
+        model_path = 's3:clc-prediction-bucket/weights.txt'
+        model_f = smart_open.open(model_path, 'r')
+        #model_f = smart_open.open(DATA_PATH.joinpath("weights.txt"), 'r')
+        #h1 = html.H1(model_f.readline(), style={"textAlign": "center", "color":  "#4397a3", "font-weight": "bold"})
+        model_f = model_f.readline()
+        json_acceptable_string = model_f.replace("'", "\"")
+        d = json.loads(json_acceptable_string)
+        w = np.array(d['weights'])
+        #model_f.close()
+    except Exception as e:
+        h1 = html.H1(str(e), style={"textAlign": "center", "color":  "#4397a3", "font-weight": "bold"})
+    
     content_type, content_string = contents.split(',')
 
     decoded = base64.b64decode(content_string)
@@ -51,7 +82,7 @@ def parse_contents(contents, filename, date):
         if 'csv' in filename:
             # Assume that the user uploaded a CSV file
             df = pd.read_csv(
-                io.StringIO(decoded.decode('utf-8')), sep="|")
+                io.StringIO(decoded.decode('utf-8')), index_col=0)
         elif 'xls' in filename:
             # Assume that the user uploaded an excel file
             df = pd.read_excel(io.BytesIO(decoded))
@@ -60,6 +91,12 @@ def parse_contents(contents, filename, date):
         return html.Div([
             'There was an error processing this file.'
         ])
+    df_np=np.array(df)
+    x = list(np.around(w[0]+np.matmul(w[1:], np.transpose(df_np)), 1))
+    cars_list = ['car_'+ str(i)  for i in range(1, len(x)+1)] 
+    df_res = pd.DataFrame(columns=['Car', 'Prediction'])
+    df_res.Car=cars_list
+    df_res.Prediction=x
     # Return (print) the complete table uploaded
     return html.Div([
         # Write name of the file uploaded
@@ -68,9 +105,30 @@ def parse_contents(contents, filename, date):
         html.H5("Uploading time: "),html.H5(datetime.datetime.fromtimestamp(date)),
 
         dash_table.DataTable(
-            data=df.to_dict('records'),
-            columns=[{'name': i, 'id': i} for i in df.columns]
-        ),
+        id='datatable-interactivity',
+        columns=[
+            {'name': i, 'id': i, 'deletable': True, 'selectable': True} for i in df_res.columns
+        ],
+        data=df_res.to_dict('records'),
+        editable=True,
+        style_header={'backgroundColor': 'rgb(30, 30, 30)'},
+        style_cell={
+            'backgroundColor': 'rgb(50, 50, 50)',
+            'color': 'white'
+        },
+        #filter_action='native',
+        sort_action='native',
+        sort_mode='multi',
+        column_selectable='single',
+        row_selectable='multi',
+        row_deletable=True,
+        selected_columns=[],
+        selected_rows=[],
+        page_action='native',
+        page_current=0,
+        page_size=10,
+        fill_width=False
+    ),
 
         html.Hr(),  # horizontal line
 

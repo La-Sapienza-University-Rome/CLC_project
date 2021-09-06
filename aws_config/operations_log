@@ -1,0 +1,42 @@
+
+cd CLC_project/aws_config/
+
+aws cloudformation create-stack --stack-name CLCWebAppCoreStack --capabilities CAPABILITY_NAMED_IAM --template-body file://cloudformation/core.yml
+
+aws cloudformation describe-stacks --stack-name CLCWebAppCoreStack > output_config/cloudformation-core-output.json
+
+cd ../container
+
+docker build . -t 206359944707.dkr.ecr.us-east-1.amazonaws.com/carservice/service:latest
+
+docker run -p 8080:8080 206359944707.dkr.ecr.us-east-1.amazonaws.com/carservice/service:latest 
+
+aws ecr create-repository --repository-name carservice/service
+
+$(aws ecr get-login --no-include-email)
+
+docker push 206359944707.dkr.ecr.us-east-1.amazonaws.com/carservice/service:latest 
+
+aws ecr describe-images --repository-name carservice/service
+
+aws ecs create-cluster --cluster-name CarService-Cluster
+
+aws logs create-log-group --log-group-name carservice-logs
+
+cd ../aws_config
+
+aws ecs register-task-definition --cli-input-json file://aws-cli/task-definition.json
+
+aws elbv2 create-load-balancer --name carservice-nlb --scheme internet-facing --type network --subnets subnet-0d777126d8930cffe subnet-0e48ae89083da681d > output_config/nlb-output.json
+
+aws elbv2 create-target-group --name CarService-TargetGroup --port 8080 --protocol TCP --target-type ip --vpc-id vpc-0fbe748989634175f --health-check-interval-seconds 10 --health-check-path / --health-check-protocol HTTP --healthy-threshold-count 3 --unhealthy-threshold-count 3 > output_config/target-group-output.json
+
+aws elbv2 create-listener --default-actions TargetGroupArn=arn:aws:elasticloadbalancing:us-east-1:206359944707:targetgroup/CarService-TargetGroup/4c7cae60f31787c2,Type=forward --load-balancer-arn arn:aws:elasticloadbalancing:us-east-1:206359944707:loadbalancer/net/carservice-nlb/93eb69730bfcbfcb --port 80 --protocol TCP
+
+aws iam create-service-linked-role --aws-service-name ecs.amazonaws.com 
+
+aws ecs create-service --cli-input-json file://aws-cli/service-definition.json
+
+aws s3api put-bucket-policy --bucket clc-dashboard-bucket --policy file://aws-cli/clc-dashboard-bucket-policy.json
+
+aws s3api put-bucket-policy --bucket clc-prediction-bucket --policy file://aws-cli/clc-prediction-bucket-policy.json

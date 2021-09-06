@@ -1,0 +1,19 @@
+{
+  "Id": "Policy1630230744479",
+  "Version": "2012-10-17",
+  "Statement": 
+    {
+      "Sid": "Stmt1630230687677",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::clc-dashboard-bucket/*",
+      "Principal": {
+        "AWS": [
+          "REPLACE_ME_ECS_TASK_ROLE_ARN"
+        ]
+      }
+    }
+}
